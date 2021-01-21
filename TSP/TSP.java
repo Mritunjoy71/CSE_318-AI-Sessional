@@ -1,0 +1,504 @@
+import java.util.Scanner;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Vector;
+import java.util.Collections;
+
+public class TSP {
+
+    static int[] global_nnh=new int[5];
+    static int[] global_nnh_2=new int[10];
+
+    public static double calculateDistanceBetweenPoints(double x1,double y1,double x2,double y2)
+    {
+        return Math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+    }
+
+    public static void Nearest_Neighbour(double[][] myArray)
+    {
+
+        int num_of_nodes=myArray.length;
+        int index=0,then=0,counter=0;
+        double min=9999999.0;
+        double loest_distance=999999999.0;
+        double height_distance=-1;
+        int found_best_node=0;
+        int found_worst_node=0;
+
+        int[][] serial = new int[5][num_of_nodes];
+        boolean[] visited=new boolean[num_of_nodes];
+        double[] tsp_distance=new double[5];
+
+        for(int i=0;i<5;i++)
+        {
+            global_nnh[i]=-1;
+        }
+
+        int mri=0,flag=0;
+        for(int i=0;;i++)
+        {
+            int k=(int)(Math.random() * (((num_of_nodes-1)-0) + 1)) + 0;
+
+            for(int j=0;j<5;j++)
+            {
+                if(global_nnh[j]==k)
+                {
+                    flag=1;
+                    break;
+                }
+            }
+
+            if(flag==0)
+            {
+                global_nnh[mri]=k;
+                mri++;
+            }
+            flag=0;
+
+            if(mri==5)
+            {
+                break;
+            }
+        }
+
+        for(int k=0;k<5;k++) {
+
+            int permanent_index=global_nnh[k];
+            index=permanent_index;
+            counter=0;
+            min = 9999999.0;
+
+            for (int i = 0; i < num_of_nodes; i++) {
+                visited[i] = false;
+            }
+            visited[permanent_index] = true;
+            serial[k][counter] = permanent_index;
+
+            for (int i = 0; i < num_of_nodes - 1; i++) {
+
+                for (int j = 0; j < num_of_nodes; j++) {
+
+                    if (myArray[index][j] < min && !visited[j]) {
+                        min = myArray[index][j];
+                        then = j;
+                    }
+                }
+                counter++;
+                visited[then] = true;
+                serial[k][counter] = then;
+                index = then;
+                min = 9999999.0;
+            }
+
+            index=0;
+            double total_distance=0.0;
+            for(int i=0;i<num_of_nodes-1;i++)
+            {
+                total_distance=total_distance+myArray[serial[k][i]][serial[k][i+1]];
+            }
+            total_distance=total_distance+myArray[serial[k][num_of_nodes-1]][serial[k][0]];
+
+            if(total_distance<loest_distance)
+            {
+                loest_distance=total_distance;
+                found_best_node=permanent_index;
+            }
+
+            if(total_distance>height_distance)
+            {
+                height_distance=total_distance;
+                found_worst_node=permanent_index;
+            }
+            tsp_distance[k]=total_distance;
+
+        }
+
+        System.out.println("Nearest Neighbour Heuristic :");
+        System.out.println();
+
+        for(int i=0;i<5;i++)
+        {
+            System.out.println("Starting Node no :" + (global_nnh[i]+1) +"   Tour Cost : "+ tsp_distance[i]);
+        }
+
+        System.out.println("Best node is :"+(found_best_node+1));
+        System.out.println("Worst node is :"+(found_worst_node+1));
+        System.out.println();
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println();
+
+    }
+
+
+
+    public static void Improved(double[][] myArray)
+    {
+
+        int num_of_nodes=myArray.length;
+        int index=0,then=0,counter=0;
+        double min=9999999.0;
+        double loest_distance=999999999.0;
+        double height_distance=-1;
+        int found_best_node=0;
+        int found_worst_node=0;
+
+        int[][] serial = new int[10][num_of_nodes];
+        boolean[] visited=new boolean[num_of_nodes];
+        double[] tsp_distance=new double[10];
+
+        for(int i=0;i<10;i++)
+        {
+            global_nnh_2[i]=-1;
+        }
+
+        int mri=0,flag=0;
+        for(int i=0;;i++)
+        {
+            int k=(int)(Math.random() * (((num_of_nodes-1)-0) + 1)) + 0;
+
+            for(int j=0;j<10;j++)
+            {
+                if(global_nnh_2[j]==k)
+                {
+                    flag=1;
+                    break;
+                }
+            }
+
+            if(flag==0)
+            {
+                global_nnh_2[mri]=k;
+                mri++;
+            }
+            flag=0;
+
+            if(mri==10)
+            {
+                break;
+            }
+        }
+
+        for(int k=0;k<10;k++) {
+
+            double[] neww=new double[num_of_nodes];
+
+            int permanent_index=global_nnh_2[k];
+            index=permanent_index;
+            counter=0;
+            min = 9999999.0;
+
+            for (int i = 0; i < num_of_nodes; i++) {
+                visited[i] = false;
+            }
+            visited[permanent_index] = true;
+            serial[k][counter] = permanent_index;
+
+            for (int i = 0; i < num_of_nodes - 1; i++) {
+
+                for (int j = 0; j < num_of_nodes; j++) {
+
+                    for(int l=0;l<num_of_nodes;l++)
+                    {
+                        int hh=(int)(Math.random() * (((num_of_nodes-1)-0) + 1)) + 0;
+                        if (myArray[index][hh] < min && !visited[hh]) {
+                            min = myArray[index][hh];
+                            then = j;
+                            break;
+                        }
+                    }
+
+                }
+                counter++;
+                visited[then] = true;
+                serial[k][counter] = then;
+                index = then;
+                min = 9999999.0;
+            }
+
+            index=0;
+            double total_distance=0.0;
+            for(int i=0;i<num_of_nodes-1;i++)
+            {
+                total_distance=total_distance+myArray[serial[k][i]][serial[k][i+1]];
+            }
+            total_distance=total_distance+myArray[serial[k][num_of_nodes-1]][serial[k][0]];
+
+            if(total_distance<loest_distance)
+            {
+                loest_distance=total_distance;
+                found_best_node=permanent_index;
+            }
+
+            if(total_distance>height_distance)
+            {
+                height_distance=total_distance;
+                found_worst_node=permanent_index;
+            }
+            tsp_distance[k]=total_distance;
+
+        }
+
+        System.out.println("Neighbour Heuristic Modified:");
+        System.out.println();
+
+        for(int i=0;i<10;i++)
+        {
+            System.out.println("Starting Node no :" + (global_nnh_2[i]+1) +"   Tour Cost : "+ tsp_distance[i]);
+        }
+
+        System.out.println("Best node is :"+(found_best_node+1));
+        System.out.println("Worst node is :"+(found_worst_node+1));
+        System.out.println();
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println();
+
+    }
+
+
+
+
+    public static void Saving(double[][] myArray)
+    {
+
+        int num_of_nodes=myArray.length;
+        int index=0,then=0,counter=0;
+        double min=9999999.0;
+        double loest_distance=999999999.0;
+        double height_distance=-1;
+        int found_best_node=0;
+        int found_worst_node=0;
+
+        int[][] serial = new int[5][num_of_nodes*2];
+        boolean[] visited=new boolean[num_of_nodes];
+        double[] tsp_distance=new double[5];
+        double[][] saved = new double[num_of_nodes][num_of_nodes];
+
+        for(int i=0;i<num_of_nodes;i++)
+        {
+            for(int j=0;j<num_of_nodes;j++)
+            {
+                myArray[i][j]=myArray[i][j]*2;
+            }
+        }
+
+
+
+
+        for(int k=0;k<5;k++) {
+
+            for(int i=0;i<num_of_nodes;i++)
+            {
+                for(int j=0;j<num_of_nodes;j++)
+                {
+                    saved[i][j]=0;
+                }
+            }
+
+            int permanent_index=global_nnh[k];
+
+            for (int i = 0; i < num_of_nodes; i++) {
+
+                for (int j = 0; j < num_of_nodes; j++) {
+
+                    if(i==j || i==permanent_index || j==permanent_index)
+                    {
+                        continue;
+                    }
+
+                    saved[i][j]=(myArray[permanent_index][i]+myArray[permanent_index][j]-myArray[i][j])/2;
+
+                }
+            }
+
+
+            int ref=1;
+            Vector<Double> v = new Vector();
+
+            for (int i = 0; i < num_of_nodes; i++) {
+
+                for (int j = ref; j < num_of_nodes; j++) {
+
+                    v.add(saved[i][j]);
+                }
+                ref++;
+            }
+
+
+            Collections.sort(v);
+            Collections.reverse(v);
+
+            int ss=0;
+
+            int[] taken=new int[num_of_nodes];
+
+            for(int i=0;i<num_of_nodes;i++)
+            {
+                taken[i]=0;
+            }
+
+            int cc=0,exitt=0;
+            ref=1;
+
+            for(int x=0;x<v.size();x++) {
+
+                double nextt=v.get(ss);
+
+                for (int i = 0; i < num_of_nodes; i++) {
+
+                    for (int j = ref; j < num_of_nodes; j++) {
+
+                        if(saved[i][j]==nextt && taken[i]<2 && taken[j]<2)
+                        {
+                            if((taken[i]==0 && taken[j]==0) || (taken[i]==0 && taken[j]==1) || (taken[i]==1 && taken[j]==0) || ((taken[i]==1 && taken[j]==1) && exitt==num_of_nodes-1))
+                            {
+                                //System.out.println("lll");
+                                serial[k][cc]=i;
+                                //System.out.println(serial[k][cc]);
+                                serial[k][cc+1]=j;
+                                //System.out.println(serial[k][cc+1]);
+                                cc=cc+2;
+                                taken[i]++;
+                                taken[j]++;
+
+                                nextt=v.get(ss);
+                                exitt++;
+                            }
+
+                        }
+                    }
+                    ref++;
+                }
+                if(exitt==num_of_nodes)
+                {
+                    break;
+                }
+
+                ss++;
+                ref=1;
+            }
+
+
+            double total_distance=0.0;
+            for(int i=0;i<num_of_nodes;i=i+2)
+            {
+                total_distance=total_distance+myArray[serial[k][i]][serial[k][i+1]]/2;
+                //System.out.println(serial[k][i]+"  "+serial[k][i+1]);
+            }
+
+            if(total_distance<loest_distance)
+            {
+                loest_distance=total_distance;
+                found_best_node=permanent_index;
+            }
+
+            if(total_distance>height_distance)
+            {
+                height_distance=total_distance;
+                found_worst_node=permanent_index;
+            }
+            tsp_distance[k]=total_distance;
+
+
+        }
+
+        System.out.println("Saving Heuristic :");
+        System.out.println();
+
+        for(int i=0;i<5;i++)
+        {
+            System.out.println("Starting Node no :" + (global_nnh[i]+1) +"   Tour Cost : "+ tsp_distance[i]);
+        }
+
+        System.out.println("Best node is :"+(found_best_node+1));
+        System.out.println("Worst node is :"+(found_worst_node+1));
+        System.out.println();
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println();
+
+    }
+
+
+
+
+
+
+    public static void main(String[] args) {
+
+        int num_of_nodes=0;
+        boolean booly=true;
+        int counter=0;
+        Vector<Double> Node_X = new Vector();
+        Vector<Double> Node_Y = new Vector();
+        String part1="",part2="",part3="";
+
+
+        try {
+            List<String> allLines = Files.readAllLines(Paths.get("burma14.tsp"));
+            for (String line : allLines) {
+                //System.out.println(line);
+
+                for (String retval: line.split(" ")) {
+
+                    if(counter==0 && retval.length()!=0)
+                    {
+                        part1 = retval;
+                        counter=1;
+                    }
+                    else if(counter==1 && retval.length()!=0)
+                    {
+                        part2 = retval;
+                        counter=2;
+                    }
+                    else if(counter==2 && retval.length()!=0)
+                    {
+                        part3 = retval;
+                    }
+                }
+
+                Node_X.add(Double.parseDouble(part2));
+                Node_Y.add(Double.parseDouble(part3));
+
+                //System.out.println(part1+"   "+part2+"   "+part3);
+                counter=0;
+
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        num_of_nodes=Integer.parseInt(part1);
+
+        double[][] myArray = new double[num_of_nodes][num_of_nodes];
+
+        for(int i=0;i<num_of_nodes;i++)
+        {
+            for (int j=0;j<num_of_nodes;j++)
+            {
+                myArray[i][j]=0;
+            }
+        }
+
+        for(int i=0;i<num_of_nodes;i++)
+        {
+            for (int j=0;j<num_of_nodes;j++)
+            {
+                myArray[i][j]=calculateDistanceBetweenPoints(Node_X.get(i),Node_Y.get(i),Node_X.get(j),Node_Y.get(j));
+                myArray[j][i]=myArray[i][j];
+            }
+        }
+
+
+
+
+        Nearest_Neighbour(myArray);
+        Improved(myArray);
+        Saving(myArray);
+
+
+
+    }
+
+}

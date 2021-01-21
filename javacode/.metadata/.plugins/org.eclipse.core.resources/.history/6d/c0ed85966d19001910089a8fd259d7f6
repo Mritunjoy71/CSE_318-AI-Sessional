@@ -1,0 +1,19 @@
+package testing;
+
+public class User {
+    private String name ; 
+    private Library library ; 
+
+    public User(String name, Library library) {
+        this.name = name;
+        this.library = library;
+    }
+    
+    //exception
+    //public void book_lend(Book book){
+    
+   // } 
+    
+    //public void book_return
+    
+}

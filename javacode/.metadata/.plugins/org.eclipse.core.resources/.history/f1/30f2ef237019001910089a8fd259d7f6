@@ -1,0 +1,24 @@
+package testing;
+
+public class Book {
+    private String name ; 
+    private int number_of_copy ; 
+    private Library library ; 
+
+    public Book(String name, int number_of_copy, Library library) {
+        this.name = name;
+        this.number_of_copy = number_of_copy;
+        this.library = library;
+    }
+
+    // Return available number of copies of this book in the library
+    public int available_books(){
+        return this.number_of_copy;
+    }
+    public String bookname() {
+    	return this.name;
+    }
+    public int bookcopy() {
+    	return this.number_of_copy;
+    }
+}    
